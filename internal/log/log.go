@@ -2,7 +2,6 @@ package log
 
 import (
 	"io"
-	"io/fs"
 	"os"
 	"path"
 	"sort"
@@ -39,19 +38,10 @@ func NewLog(dir string, c Config) (*Log, error) {
 }
 
 func (l *Log) setup() error {
-	entries, err := os.ReadDir(l.Dir)
+	files, err := os.ReadDir(l.Dir)
 	if err != nil {
 		return err
 	}
-	files := make([]fs.FileInfo, 0, len(entries))
-	for _, entry := range entries {
-		file, err := entry.Info()
-		if err != nil {
-			return err
-		}
-		files = append(files, file)
-	}
-
 	var baseOffsets []uint64
 	for _, file := range files {
 		offStr := strings.TrimSuffix(
@@ -65,7 +55,7 @@ func (l *Log) setup() error {
 		return baseOffsets[i] < baseOffsets[j]
 	})
 	for i := 0; i < len(baseOffsets); i++ {
-		if err = l.newSegment(baseOffsets[1]); err != nil {
+		if err = l.newSegment(baseOffsets[i]); err != nil {
 			return err
 		}
 		// baseOffset contains dup for index and store so we skip

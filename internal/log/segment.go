@@ -85,7 +85,7 @@ func (s *segment) Read(off uint64) (*api.Record, error) {
 	}
 	record := &api.Record{}
 	err = proto.Unmarshal(p, record)
-	return record, nil
+	return record, err
 }
 
 func (s *segment) IsMaxed() bool {
@@ -116,9 +116,9 @@ func (s *segment) Close() error {
 	return nil
 }
 
-func nearestMultiple(j, k uint64) uint64 {
-	if j >= 0 {
-		return (j / k) * k
-	}
-	return ((j - k + 1) / k) * k
-}
+// func nearestMultiple(j, k uint64) uint64 {
+// 	if j >= 0 {
+// 		return (j / k) * k
+// 	}
+// 	return ((j - k + 1) / k) * k
+// }

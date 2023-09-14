@@ -6,6 +6,7 @@ import (
 	"go.uber.org/zap"
 
 	"github.com/hashicorp/serf/serf"
+	"github.com/hashicorp/raft"
 )
 
 type Membership struct {
@@ -113,7 +114,11 @@ func (m *Membership) Leave() error {
 }
 
 func (m *Membership) logError(err error, msg string, member serf.Member) {
-	m.logger.Error(
+	log := m.logger.Error
+	if err == raft.ErrNotLeader {
+		log = m.logger.Debug
+	}
+	log(
 		msg,
 		zap.Error(err),
 		zap.String("name", member.Name),

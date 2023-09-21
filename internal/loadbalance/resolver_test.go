@@ -1,6 +1,7 @@
 package loadbalance_test
 
 import (
+	"fmt"
 	"net"
 	"net/url"
 	"testing"
@@ -49,7 +50,12 @@ func TestResolver(t *testing.T)  {
 	clientCreds := credentials.NewTLS(tlsConfig)
 	opts := resolver.BuildOptions{DialCreds: clientCreds}
 	r := &loadbalance.Resolver{}
-	_, err = r.Build(resolver.Target{URL: url.URL{Path: l.Addr().String()}}, conn, opts)
+	_, err = r.Build(
+		resolver.Target{
+			URL: url.URL{Path: fmt.Sprintf("/%s", l.Addr().String())}},
+			conn,
+			opts,
+	)
 	require.NoError(t, err)
 
 	wantState := resolver.State{
